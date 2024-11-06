@@ -297,7 +297,7 @@ def validate_response_format(response_text: str) -> Tuple[str, bool]:
 
     lines = response_text.strip().split('\n')
     if lines and lines[0].strip().startswith('```'):
-        return ("``` ``` 블록은 파일 코드와 docstring을 적은 내용에 사용해야 합니다.", False)
+        return ("이전 작성 시도에 대한 응답: ``` ``` 블록은 파일 코드와 docstring을 적은 내용에 사용해야 합니다.", False)
     
     header_pattern = re.compile(r'^(#{1,6})\s+(.+)/\s*$')
     file_pattern = re.compile(r'^(#{1,6})\s+([\w/]+\.py)\s*$')
@@ -316,13 +316,13 @@ def validate_response_format(response_text: str) -> Tuple[str, bool]:
             headers.append((num_hashes, dir_name))
     
     if not headers:
-        return ("#으로 레벨을 구분하여 표현된 프로젝트 디렉토리가 없습니다.", False)
+        return ("이전 작성 시도에 대한 응답: #으로 레벨을 구분하여 표현된 프로젝트 디렉토리가 없습니다.", False)
     
     min_hash = min(header[0] for header in headers)
     top_level_dirs = [header for header in headers if header[0] == min_hash]
     
     if len(top_level_dirs) != 1:
-        return ("코드 작성은 최상단 디렉토리 내에 해야 합니다.", False)
+        return ("이전 작성 시도에 대한 응답: 코드 작성은 최상단 디렉토리 부터 #으로 구분하며 작성 해야 합니다.", False)
     
     top_level_dir_name = top_level_dirs[0][1]
     
@@ -365,6 +365,6 @@ def validate_response_format(response_text: str) -> Tuple[str, bool]:
             break
     
     if not test_init_exists:
-        return ("'test/__init__.py' 또는 'tests/__init__.py' 파일이 프로젝트 구조 내에 있어야 합니다.", False)
+        return ("'test/__init__.py' 또는 'tests/__init__.py' 파일이 스켈레톤 코드에 작성되어 있어야 합니다. 또한 빈 디렉토리는 __init__.py를 작성 해야 합니다.", False)
     
     return ("형식이 올바릅니다.", True)

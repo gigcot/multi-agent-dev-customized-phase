@@ -12,35 +12,38 @@ class ImplAndTestForCommitPhase(BasePhaseRepositoryImpl):
         model_config: ModelConfig,
         phase_prompt: str = 
 """
-[아래 주어진 자료를 참고하여, 조건과 상황에 맞는 답변을 반환 형식에 따라 작성하세요.]
+현재 작업과 상황을 참고하여 반환 형식에 맞게 답변을 작성하세요.
 
 [자료]
 
-현재까지 작성된 스켈레톤 코드: (#으로 level이 구분되어 있습니다.)
+현재까지 작성된 스켈레톤 코드: (#으로 트리 구조가 구분되어 있습니다.)
 
 {skeleton_code}
 전체 구현 단계:
 {impl_step}
-[조건]
-1. 우리는 전체 진행 단계에 대해 한 단계씩, 작성한 코드의 테스트가 통과할 때 까지 코드를 작성 또는 수정하고 다음단계로 진행되는 작업을 진행 중입니다.
-2. 현재 진행 중인 단계에 해당하는 작업을 진행하세요. 스켈레톤 코드에서 내용을 추가 또는 수정하면 됩니다.
-    **답변 시 추가/수정 사항을 전체 코드와 함께 반환해야합니다.**
-3. 현재단계 메서드 구현과 해당 메서드 테스트 코드도 함께 작성해야 합니다. 테스트 코드는 test폴더 내에 작성 해야합니다. 
-    테스트 코드는 테스트 케이스를 고려하여 작성하세요. 또한 해당 테스트만을 진행하기 위한 메인가드 블록을 사용해야 합니다.
-4. 코드의 작성은 반환 형식에 따라 #으로 level을 구분하여 최상위 부터 프로젝트 구조와 함께 작성되어야 합니다.
-5. 다음 단계 진행 상 의존성 문제가 생기지 않는 선에서, 필요하다고 생각되는 경우 메서드 추가가 가능합니다.
-    추가사항도 형식에 따라 프로젝트 구조와 일관되도록 작성 해야합니다.
-6. 코드 작성을 마쳤다면 답변 마지막 줄에 테스트할 메서드가 포함된 파일을 형식에 따라 적으세요.
-7. 협업자 모두가 follow할 수 있도록 **반환 형식을 반드시 지켜야 합니다**.
-
 [상황]
-1. 우리는 지금 고객의 요구에 만족하는 **프로젝트 코드와 테스트 코드 구현 성공을 목표**로 하고 있습니다.
-2. 현재 우리는 "{current_step}단계"의 {code_error_resolve_attempts}번 째 코드 작성 시도 입니다.
-3. 코드와 그 테스트 실행이 실패한 경우에만 작성 시도로 간주되며, 반환 형식 위반으로 인한 재작성은 시도 횟수에 포함하지 않습니다.
-4. 시스템 메시지에 따라서
-    a. 구현 단계에 해당하는 코드와 테스트 코드 작성.
-    b. 테스트를 통과하도록 코드수정 또는 예외처리 추가
-    c. 반환 형식을 준수하여 답변
+현재 우리는 전체 진행 구현 단계에 대해 한 단계씩 구현하면서, 테스트가 통과할 때까지 코드를 작성 또는 수정하고, 하나의 단계가 완료되면 다음 단계로 진행하면서 전체 구현단계가 완료되도록 작업을 진행중입니다.
+
+[지시]
+1. 현재 진행 중인 단계에 해당하는 작업을 진행하세요. 작성된 스켈레톤 코드에서 내용을 추가 또는 수정하면 됩니다.
+   **추가/수정 사항을 전체 코드와 함께 반환해야 합니다.**
+2. 현재 단계의 파일 내 기능 구현과 동시에 테스트 코드 구현도 함께 진행하세요.
+3. 테스트 코드는 test 폴더 내에 작성하고, 주요 테스트 시나리오와 메인가드 블록을 포함해야 합니다.
+4. 기능 구현과 테스트 코드 작성 시 완전하게 구현해야 합니다.(**placeholder나 pass는 제한됩니다.**)
+5. 각 주요 로직 구문에 대해 주석을 추가하여 해당 코드의 목적을 설명하세요.
+6. 코드 작성은 반환 형식에 따라 #을 사용하여 트리 구조가 구분 되도록 하고, 최상단 디렉토리부터 작성해야 합니다.
+7. 답변 마지막 줄에 테스트할 메서드가 포함된 파일을 형식에 따라 적으세요.
+8. 협업자 모두가 따를 수 있도록 **반환 형식을 반드시 준수**하세요.
+
+
+[작업 현황]
+• 현재 "{current_step}단계"의 {code_error_resolve_attempts}번째 코드 작성 시도 중입니다.
+    구현 단계에 해당하는 프로젝트 코드와 테스트 코드 작성을 진행하세요.
+[조건]
+• 시스템 메시지에 테스트 실패(FAILED)가 있는경우
+    - 테스트가 통과하도록 프로젝트 코드의 import문, 변수, 구문, 예외 처리, 로직, 타입 또는 반환값 또는 테스트 코드의 기대값 등을 수정하세요.
+• 시스템 메시지에 반환형식 위반이 있는경우
+    - 반환 형식을 준수하여 답변하세요.
 
 "{current_step}단계 시스템 메시지:
 "{error_code}"
@@ -48,7 +51,7 @@ class ImplAndTestForCommitPhase(BasePhaseRepositoryImpl):
 
 반환 형식:
 PATH/FILENAME
-```python
+```
 '''
 DOCSTRING
 '''
@@ -108,7 +111,17 @@ CODE
         env: ChatEnvRepositoryImpl,
     ) -> ChatEnvRepositoryImpl:
         
-        container = DockerToolRepositoryImpl.get_container("si_foIIow_test", volume=env.config.directory)
+        abs_path = os.path.abspath("pipeline/utils")
+        if build_docker_image(path=abs_path, tag="using_xvfb:v1"):
+            print("이미지 빌드 성공. 다음 작업을 진행합니다.")
+        else:
+            print("이미지 빌드에 실패했습니다.")
+
+        container = DockerToolRepositoryImpl.get_container(
+                                                            "si_foIIow_test",
+                                                            volume=env.config.directory,
+                                                            image_name="using_xvfb:v1",
+                                                            )
         self.update_phase_states(env)
         print(f"{self.states.impl_step}\n==> 입력된 impl_step입니다.")
         self.states.total_step_num = count_steps(self.states.impl_step)
@@ -121,7 +134,7 @@ CODE
                 self.update_phase_states(env)
                 
                 if is_error_in_conclusion :
-                    env.states.error_code = f"이전 응답에서 반환 형식을 위반하여 코드 실행 전에 재응답을 요청하였습니다.:\n{error_message_in_validate}"
+                    env.states.error_code = f"이전 응답에서 반환 형식을 위반하여 테스트 실행 전에 재응답을 요청하였습니다.:\n{error_message_in_validate}"
                 env.states.code_error_resolve_attempts = code_error_resolve_attempts
                 seminar_conclusion = self.chatting(
                                                     env=env,
@@ -146,7 +159,7 @@ CODE
                 error_code, is_step_complete = verify_functionality(file_path, file_name, container, env)
                 print(f"error code: {error_code},\nis_step_complete: {is_step_complete}")
                 remove_pycache_dirs(env)
-                if is_step_complete != 0:
+                if is_step_complete != True:
                     code_error_resolve_attempts += 1
                     if code_error_resolve_attempts == 4:
                         print(f"{step}단계 오류수정 시도 {code_error_resolve_attempts-1}회로 제한 횟수 초과하여 다음 구현 단계로 넘어갑니다.")
@@ -161,7 +174,7 @@ CODE
                     is_error_in_conclusion = False
                     continue
 
-                if is_step_complete == 0:
+                if is_step_complete == True:
                     self.update_env_states(env)
                     self.states.error_code = ""
                     self.states.current_step += 1
@@ -245,80 +258,111 @@ from typing import List, Dict
 
 def parse_text(input_str: str) -> List[Dict[str, str]]:
     """
-    주어진 문자열에서 프로젝트 파일 경로와 코드 블록을 추출하여
-    {'path': full_path, 'code': code_block} 형태의 딕셔너리 리스트로 반환합니다.
+    Parses the input string representing the project structure and extracts
+    the file paths and code blocks.
 
     Args:
-        input_str (str): 파싱할 프로젝트 구조를 나타내는 문자열.
+        input_str (str): The project structure string to parse.
 
     Returns:
-        List[Dict[str, str]]: 각 파일의 경로와 코드 블록을 포함하는 딕셔너리 리스트.
+        List[Dict[str, str]]: A list of dictionaries with 'path', 'code', and 'type' keys.
     """
-    path_stack = []  # 현재 경로를 추적하기 위한 스택
-    result = []      # 최종 결과를 저장할 리스트
-    in_code_block = False  # 코드 블록 내부에 있는지 여부
-    code_block_lang = ''   # 코드 블록의 언어 (예: python)
-    code_lines = []        # 현재 코드 블록의 라인들을 저장
-    current_file = None    # 현재 파일명을 저장
+    path_stack = []  # Stack to keep track of current path
+    result = []      # List to store the final result
+    in_code_block = False
+    code_block_lang = ''
+    code_lines = []
+    current_file = None
 
-    # 정규식을 사용하여 헤더와 코드 블록을 식별
+    # Regular expressions to match headers and code blocks
     header_pattern = re.compile(r'^(#{1,6})\s+(.*)')
     code_block_start_pattern = re.compile(r'^```(\w+)?')
     code_block_end_pattern = re.compile(r'^```$')
 
     lines = input_str.splitlines()
 
+    # Find the minimum header level to determine the base level
+    header_levels = []
     for line in lines:
-        # 코드 블록 시작
+        header_match = header_pattern.match(line)
+        if header_match:
+            hashes, _ = header_match.groups()
+            level = len(hashes)
+            header_levels.append(level)
+
+    if not header_levels:
+        base_level = 1  # Default base level if no headers are found
+    else:
+        base_level = min(header_levels)
+
+    for line in lines:
+        line = line.rstrip()
+        # Code block start
         if not in_code_block and code_block_start_pattern.match(line):
             in_code_block = True
             code_block_lang = code_block_start_pattern.match(line).group(1) or ''
             code_lines = []
             continue
 
-        # 코드 블록 끝
+        # Code block end
         if in_code_block and code_block_end_pattern.match(line):
             in_code_block = False
-            # 전체 경로 생성
+            code = '\n'.join(code_lines).strip()
             if current_file:
                 full_path = '/'.join(path_stack + [current_file])
+                result.append({
+                    'path': full_path,
+                    'code': code,
+                    'type': 'file'
+                })
+                current_file = None
             else:
+                # If there's code but no current file, associate it with the current directory
                 full_path = '/'.join(path_stack)
-            # 코드 블록의 내용을 하나의 문자열로 결합
-            code = '\n'.join(code_lines).strip()
-            # 결과 리스트에 추가
-            result.append({
-                'path': full_path,
-                'code': code
-            })
+                result.append({
+                    'path': full_path,
+                    'code': code,
+                    'type': 'directory'
+                })
             continue
 
-        # 코드 블록 내부인 경우 코드 라인 저장
+        # Inside code block
         if in_code_block:
             code_lines.append(line)
             continue
 
-        # 헤더 라인 처리
+        # Header line
         header_match = header_pattern.match(line)
         if header_match:
             hashes, heading_text = header_match.groups()
             level = len(hashes)
+            depth = level - base_level
 
-            base_level = 3  # 프로젝트 루트를 3단계 헤더로 가정
-
-            # 현재 스택의 길이를 조정하여 새로운 레벨에 맞춤
-            while len(path_stack) >= (level - base_level + 1):
-                path_stack.pop()
-
-            if heading_text.endswith('/'):
-                # 디렉토리인 경우
-                directory = heading_text.rstrip('/')
-                path_stack.append(directory)
-                current_file = None  # 디렉토리를 변경하면 현재 파일명 초기화
+            # Adjust the path stack to match the current depth
+            if depth < 0:
+                path_stack = []
             else:
-                # 파일인 경우
-                current_file = heading_text  # 파일명을 현재 파일로 설정
-            continue  # 다음 라인으로 이동
+                while len(path_stack) > depth:
+                    path_stack.pop()
+
+            # Split the heading text from any description after a colon
+            heading_parts = heading_text.split(':', 1)
+            heading_name = heading_parts[0].strip()
+
+            if heading_name.endswith('/'):
+                # It's a directory
+                directory = heading_name.rstrip('/')
+                path_stack.append(directory)
+                result.append({
+                    'path': '/'.join(path_stack),
+                    'code': '',
+                    'type': 'directory'
+                })
+                current_file = None
+            else:
+                # It's a file
+                current_file = heading_name
+            continue
 
     return result
 
@@ -327,37 +371,38 @@ import difflib
 def rewrite_codes(files, base_path='.', diff_output_dir=None, proj_dir="project"):
     project_path = os.path.join(base_path, proj_dir)
 
-    # 'project' 폴더가 존재하지 않으면 생성
+    # Ensure the 'project' folder exists
     if not os.path.isdir(project_path):
         try:
             os.makedirs(project_path, exist_ok=True)
-            print(f"{proj_dir} 폴더를 생성했습니다: {project_path}")
+            print(f"{proj_dir} folder created at: {project_path}")
         except (IOError, OSError) as e:
-            print(f"{proj_dir} 폴더를 생성할 수 없습니다. 오류: {e}")
+            print(f"Cannot create {proj_dir} folder. Error: {e}")
             return
 
     base_path = project_path
     print(f"files:\n\n{files}\n\n")
     for file in files:
         normalized_path = os.path.normpath(file['path'])
-        base_name = os.path.basename(normalized_path)
-        dir_name = os.path.dirname(normalized_path)
-
-        # 파일 경로 생성
-        file_path = os.path.join(base_path, dir_name, base_name)
+        file_path = os.path.join(base_path, normalized_path)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        print(f"{base_name}")
+        print(f"Processing: {normalized_path}")
         print(f"file_path: {file_path}")
-        print(f"dir_name: {dir_name}")
+
+        if file['type'] == 'directory':
+            # Create the directory if it doesn't exist
+            os.makedirs(file_path, exist_ok=True)
+            print(f"Created directory {file_path}")
+            continue
 
         new_code_lines = file['code'].splitlines(keepends=True)
 
         if os.path.exists(file_path):
-            # 기존 파일 읽기
+            # Read the existing file
             with open(file_path, 'r', encoding='utf-8') as f:
                 existing_code_lines = f.readlines()
 
-            # Diff 생성
+            # Create a diff
             diff = difflib.unified_diff(
                 existing_code_lines, new_code_lines,
                 fromfile=f'original/{file["path"]}',
@@ -367,15 +412,15 @@ def rewrite_codes(files, base_path='.', diff_output_dir=None, proj_dir="project"
             diff_text = '\n'.join(diff)
 
             if diff_text:
-                # 변경 사항이 있으면 파일 업데이트 및 Diff 출력
+                # Update the file if there are changes
                 with open(file_path, 'w', encoding='utf-8') as f:
                     f.writelines(new_code_lines)
                 print(f"Updated code in {file_path}")
 
-                # Diff 출력
+                # Output the diff
                 print(f"Changes in {file_path}:\n{diff_text}\n")
 
-                # Diff를 파일로 저장 (선택 사항)
+                # Optionally save the diff to a file
                 if diff_output_dir:
                     diff_file_path = os.path.join(diff_output_dir, f'{file["path"]}.diff')
                     diff_dir = os.path.dirname(diff_file_path)
@@ -386,87 +431,186 @@ def rewrite_codes(files, base_path='.', diff_output_dir=None, proj_dir="project"
             else:
                 print(f"No changes detected in {file_path}")
         else:
-            # 파일 생성
+            # Create a new file
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.writelines(new_code_lines)
             print(f"Created new file {file_path}")
 
 # 메서드 추가
 
-import os
-import re
-
 def install_missing_modules(error_message, container):
-    # 오류 메시지에서 누락된 모듈 이름 추출
+    import re
+    import docker
 
+    # 오류 메시지에서 누락된 모듈 이름 추출
     match = re.search(r"No module named '([^']+)'", error_message)
     if match:
         module_name = match.group(1)
         print(f"Installing missing module: {module_name}")
-        
+
         # 모듈 이름 검증
         if not re.match(r'^[a-zA-Z0-9_\-]+$', module_name):
             print(f"Invalid module name detected: {module_name}")
             return False
-        
+
         # 모듈 설치
         try:
-            #subprocess.check_call([sys.executable, "-m", "pip", "install", module_name])
-            output, error_code = DockerToolRepositoryImpl.exec_command(container, f"python -m pip install {module_name}")
-            print(f"Successfully installed module: {module_name}")
-            if error_code == 0:
+            # Docker SDK를 사용하여 컨테이너 내에서 pip install 실행
+            install_command = f"python -m pip install {module_name}"
+            exec_install = container.exec_run(install_command)
+            install_output = exec_install.output.decode('utf-8', errors='ignore')
+            install_exit_code = exec_install.exit_code
 
-                return output
-        except error_code as e:
-            print(f"Failed to install module {module_name}: {e}")
-            return False
+            if install_exit_code == 0:
+                print(f"Successfully installed module: {module_name}")
+                return install_output, True
+            else:
+                print(f"Failed to install module {module_name}. Output:\n{install_output}")
+                return install_output, False
+
+        except Exception as e:
+            print(f"Exception occurred while installing module {module_name}: {e}")
+            return e, False
     else:
         print("Could not extract module name from error message.")
-        return False
+        return "Could not extract module name from error message.", False
 
-def verify_functionality (file_path, file_name, container, env, retries=0, max_retries=3, base_path="project"):
+import os
+import re
+import time
+import threading
+import docker
+
+def verify_functionality(file_path, file_name, container, env, retries=0, max_retries=3, base_path="project"):
     if retries > max_retries:
         print("Maximum retry limit reached.")
         return "Maximum retry limit reached.", False
-    
+
+    # 기존 경로 설정 로직
     potential_path = os.path.join(env.config.directory, base_path, file_path, file_name)
-    norm_path= os.path.normpath(potential_path) if os.path.exists(potential_path) else next((os.path.normpath(os.path.join(root, file_name)) for root, _, files in os.walk(os.path.join(env.config.directory, base_path)) if file_name in files), "")
-    print(f"\n\nnorm_path:{norm_path}\n\n")
+    norm_path = os.path.normpath(potential_path) if os.path.exists(potential_path) else next(
+        (os.path.normpath(os.path.join(root, file_name)) for root, _, files in os.walk(os.path.join(env.config.directory, base_path)) if file_name in files), "")
     test_file = os.path.splitext(norm_path.replace("\\", "/"))[0].replace("/", ".")
-    print(f"\n\ntest_file: {test_file}\n\n")
     normalized_env_config_directory = re.sub(r"[\\/]", ".", env.config.directory)
     normalized_base_path = re.sub(r"[\\/]", ".", base_path)
     modelservedfile = os.path.splitext(re.sub(r"[\\/]", ".", os.path.join(file_path, file_name)))[0]
-    print(f"modelservedfile: {modelservedfile}")
     remaining_path = test_file.replace(normalized_env_config_directory + ".", "", 1)
     remaining_path = remaining_path.replace(normalized_base_path + ".", "", 1)
     remaining_path = remaining_path.replace("." + modelservedfile, "", 1)
-    print(f"\n\nremaining_path: {remaining_path}\n\n")
     veiled_path = remaining_path.replace(".", "/")
-    print(f"\n\nveiled_path: {veiled_path}\n\n")
-    print(f"\n\nTEST FILE PATH!!!!!\n\ncd: {env.config.directory}/{base_path}/{veiled_path}\n\npython-m {modelservedfile}\n\nTEST FILE PATH!!!!!\n\n")# export:export PYTHONPATH=/Warehouse/example/project/계산기_프로젝트 실행: warehouse부터
-    try:
-        # error_code,is_step_complete = DockerToolRepositoryImpl.exec_command(container, f"/bin/bash -c export PYTHONPATH=/{export_path2}")
-        error_code,is_step_complete = DockerToolRepositoryImpl.exec_command(container, f"/bin/bash -c 'cd \"/{env.config.directory}/{base_path}/{veiled_path}\" && python -m {modelservedfile}'")
-        # error_code,is_step_complete = DockerToolRepositoryImpl.exec_command(container, f"/bin/bash -c 'cd /{env.config.directory}/{base_path}/{cd_path} && python -m {remaining_path}.{modelservedfile}'")
-        # error_code,is_step_complete = DockerToolRepositoryImpl.exec_command(container, f"python -m {test_file}")
-        
+    print(f"test_file:{test_file}")
+    print(f"\n\nremaining_path: {remaining_path}\n\n")
+    print(f"modelservedfile:{modelservedfile}")
+    print(f"veild_path:{veiled_path}")
+    print(f"cd:{env.config.directory}/{base_path}/{veiled_path}")
+    print(f"python -m {modelservedfile}")
 
-    except error_code as e:
-        is_step_complete = False
+    # command = f"/bin/bash -c 'cd \"{env.config.directory}/{base_path}/{veiled_path}\" && python -m {modelservedfile}'"
+    timeout_duration = 10 # TODO: 추후 상위에서 설정할 수 있으면 좋을듯    
+    command = f"timeout {timeout_duration}s bash -c 'cd .. && cd \"{env.config.directory}/{base_path}/{veiled_path}\" && xvfb-run -a -s \"-screen 0 1024x768x24\" python -m {modelservedfile}'"
+
+
+    # Docker SDK를 사용하여 컨테이너에 연결
+    client = docker.from_env()
+
+    # 컨테이너 객체 확인
+    if isinstance(container, str):
+        container = client.containers.get(container)
+
+    try:
+        # 명령을 비동기적으로 실행하고 출력 스트림을 캡처
+        exec_instance = client.api.exec_create(container.id, command, tty=False)
+        exec_id = exec_instance['Id']
+        output_generator = client.api.exec_start(exec_id, detach=False, tty=False, stream=True)
+        print(f"Command started with exec_id: {exec_id}")
+
+        # 타임아웃 설정
+        timeout = 10  # 원하는 타임아웃 시간(초)
+        start_time = time.time()
+
+        output_lines = []
+
+        def read_output():
+            nonlocal output_generator, output_lines
+            try:
+                for chunk in output_generator:
+                    decoded_chunk = chunk.decode('utf-8', errors='ignore')
+                    output_lines.append(decoded_chunk)
+                    print(decoded_chunk, end='')
+            except Exception as e:
+                print(f"Output reading error: {e}")
+
+        # 출력 읽기 스레드 시작
+        output_thread = threading.Thread(target=read_output)
+        output_thread.start()
+
+        # 실행 상태를 모니터링하는 함수
+        def monitor_exec():
+            nonlocal exec_id, container
+            while True:
+                exec_info = client.api.exec_inspect(exec_id)
+                if not exec_info['Running']:
+                    print("Command completed.")
+                    break
+                if time.time() - start_time > timeout:
+                    print("Timeout reached. Sending SIGINT to the process.")
+                    # 프로세스에 SIGINT 신호 보내기
+                    pid = exec_info.get('Pid')
+                    if pid:
+                        container.exec_run(f"kill -2 {pid}", detach=True, privileged=True)
+                    else:
+                        print("Unable to get PID of the process.")
+                    break
+                time.sleep(1)
+
+        # 모니터링 스레드 시작
+        monitor_thread = threading.Thread(target=monitor_exec)
+        monitor_thread.start()
+
+        # 스레드들이 종료되길 기다림
+        output_thread.join(timeout + 5)
+        monitor_thread.join(timeout + 5)
+
+        # 실행 결과 확인
+        exec_info = client.api.exec_inspect(exec_id)
+        exit_code = exec_info['ExitCode']
+        is_step_complete = (exit_code == 0)
+
+        # 출력 내용을 결합
+        output = ''.join(output_lines)
         
-        # ModuleNotFoundError 처리
-        if 'ModuleNotFoundError' in e:
-            success = install_missing_modules(e, container)
-            if success:
-                # 모듈 설치 후 재시도
-                return verify_functionality(file_path, file_name, retries=retries+1, max_retries=max_retries)
-            else:
-                return error_code, is_step_complete
-        else:
-            # 다른 오류 처리
+        if exit_code == 124:
+            error_code = f"Timeout occurred after {timeout_duration} seconds."
+            is_step_complete = False
             return error_code, is_step_complete
+
+        
+        if not is_step_complete:
+            error_code = f"Exit code: {exit_code}\nOutput:\n{output}"
+
+            # ModuleNotFoundError 처리
+            if 'ModuleNotFoundError' in output and retries < max_retries:
+                install_output, success = install_missing_modules(output, container)
+                if success:
+                    # 모듈 설치 후 재시도
+                    return verify_functionality(file_path, file_name, container, env, retries=retries, max_retries=max_retries)
+                else:
+                    print("Module installation failed or import error.")
+                    return install_output, False
+            else:
+                # 기타 오류 처리
+                return error_code, False
+        else:
+            error_code = f"Exit code: {exit_code}\nOutput:\n{output}"
+
+    except Exception as e:
+        is_step_complete = False
+        error_code = str(e)
+        # 예외 발생 시 처리
+        return error_code, is_step_complete
+
     return error_code, is_step_complete
+
 
 def extract_test_file(seminar_conclusion: str) -> tuple:
     test_file_pattern = re.compile(r"<Test this>([^<]+)<Test this/>")
@@ -512,7 +656,7 @@ from typing import Tuple, List
 def validate_response_format(response_text: str) -> Tuple[str, bool]:
     lines = response_text.strip().split('\n')
     if lines and lines[0].strip() and not lines[0].strip().startswith('#'): 
-        return ("미사여구 없이 반환 형식에 따라 작성해주세요. ``` ``` 블록은 자료의 스켈레톤 코드처럼, 파일 코드와 docstring을 적은 내용에 사용해야 합니다..", False)
+        return ("반환 형식에 따라 작성해주세요.```plaintext ```로 전체를 감싸면 반환 형식 위반입니다. ``` ``` 블록은 자료의 스켈레톤 코드처럼, 파일명 아래 파일 코드와 docstring을 적은 내용에만 사용해야 합니다.", False)
     header_pattern = re.compile(r'^(#+)\s+(.+)/\s*$')
     file_pattern = re.compile(r'^(#+)\s+([\w/]+\.py)\s*$')
     test_tag_pattern = re.compile(r'<Test this>([\w/]+\.py)<Test this/>')
@@ -531,13 +675,13 @@ def validate_response_format(response_text: str) -> Tuple[str, bool]:
             headers.append((num_hashes, dir_name))
     
     if not headers:
-        return ("#으로 레벨을 구분하여 표현된 프로젝트 디렉토리가 없습니다.", False)
+        return ("#으로 프로젝트 트리구조를 구분하여 작성되지 않았습니다.", False)
     
     min_hash = min(header[0] for header in headers)
     top_level_dirs = [header for header in headers if header[0] == min_hash]
     
     if len(top_level_dirs) != 1:
-        return ("코드 작성은 최상단 디렉토리 내에 해야 합니다.", False)
+        return ("최상단 디렉토리 부터 #으로 트리 구조가 구분되도록 표현해야 합니다.", False)
     
     top_level_dir_name = top_level_dirs[0][1]
     
@@ -573,7 +717,7 @@ def validate_response_format(response_text: str) -> Tuple[str, bool]:
     test_files = test_tag_pattern.findall(response_text)
     print(f"test_files: {test_files}")
     if not test_files:
-        return ("에러: '<Test this>PATH/FILENAME<Test this/>' 형식의 태그가 작성되지 않았습니다.", False)
+        return ("'<Test this>PATH/FILENAME<Test this/>' 형식의 태그가 작성되지 않았습니다.", False)
     
     # 테스트 파일이 프로젝트 내에 존재하는지 확인
     missing_files = [file for file in test_files if file not in project_files]
@@ -581,6 +725,31 @@ def validate_response_format(response_text: str) -> Tuple[str, bool]:
     if missing_files:
         missing_str = ', '.join(missing_files)
         return (f"테스트 파일은 프로젝트 구조 내에 존재 해야 합니다.\
-이전에 작성된 내용이 표현하는 level 구조가 전달된 프로젝트 구조와 일치하지 않을 수 있습니다. ", False)
+이전에 작성 되어 있던 내용과 구조가 당신이 제출한 프로젝트 구조와 일치하지 않을 수 있습니다.", False)
     
     return ("형식이 올바릅니다.", True)
+
+import docker
+
+def build_docker_image(path: str, tag: str) -> bool:
+    """
+    지정된 경로의 Dockerfile을 기반으로 Docker 이미지를 빌드합니다.
+    
+    Parameters:
+        path (str): Dockerfile이 위치한 디렉토리 경로.
+        tag (str): 빌드된 이미지에 할당할 태그.
+    
+    Returns:
+        bool: 빌드 성공 여부 (성공하면 True, 실패하면 False).
+    """
+    client = docker.from_env()
+    try:
+        client.images.build(path=path, tag=tag, rm=True)
+        print(f"Docker 이미지 '{tag}'가 성공적으로 빌드되었습니다.")
+        return True
+    except docker.errors.BuildError as e:
+        print(f"이미지 빌드 실패: {e}")
+        return False
+    except docker.errors.APIError as e:
+        print(f"Docker API 오류: {e}")
+        return False

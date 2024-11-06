@@ -31,7 +31,7 @@ class SetupInitialSturcturePhase(BasePhaseRepositoryImpl):
 
 계층 구조 예시:
 ```
-1. top level dir/
+1. top_level_dir/
     1.1 */
         1.1.1 *.py: description
         ...
