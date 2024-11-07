@@ -451,7 +451,7 @@ def install_missing_modules(error_message, container):
         # 모듈 이름 검증
         if not re.match(r'^[a-zA-Z0-9_\-]+$', module_name):
             print(f"Invalid module name detected: {module_name}")
-            return False
+            return "Could not extract module name from error message.", False
 
         # 모듈 설치
         try:
@@ -482,6 +482,8 @@ import threading
 import docker
 
 def verify_functionality(file_path, file_name, container, env, retries=0, max_retries=3, base_path="project"):
+    import time
+    datetime_string = time.strftime("%y%m%d%H%M%S")
     if retries > max_retries:
         print("Maximum retry limit reached.")
         return "Maximum retry limit reached.", False
@@ -581,8 +583,7 @@ def verify_functionality(file_path, file_name, container, env, retries=0, max_re
         
         if exit_code == 124:
             error_code = f"Timeout occurred after {timeout_duration} seconds."
-            is_step_complete = False
-            return error_code, is_step_complete
+            return error_code+datetime_string, False
 
         
         if not is_step_complete:
@@ -599,7 +600,7 @@ def verify_functionality(file_path, file_name, container, env, retries=0, max_re
                     return install_output, False
             else:
                 # 기타 오류 처리
-                return error_code, False
+                return error_code+datetime_string, False
         else:
             error_code = f"Exit code: {exit_code}\nOutput:\n{output}"
 
@@ -607,9 +608,9 @@ def verify_functionality(file_path, file_name, container, env, retries=0, max_re
         is_step_complete = False
         error_code = str(e)
         # 예외 발생 시 처리
-        return error_code, is_step_complete
+        return error_code+datetime_string, is_step_complete
 
-    return error_code, is_step_complete
+    return error_code+datetime_string, is_step_complete
 
 
 def extract_test_file(seminar_conclusion: str) -> tuple:
@@ -652,11 +653,12 @@ def remove_pycache_dirs(env):
                     print(f"삭제 실패: {dir_path}. 오류: {e}")
 
 from typing import Tuple, List
-
+import time
 def validate_response_format(response_text: str) -> Tuple[str, bool]:
+    datetime_string = time.strftime("%y%m%d%H%M%S")
     lines = response_text.strip().split('\n')
     if lines and lines[0].strip() and not lines[0].strip().startswith('#'): 
-        return ("반환 형식에 따라 작성해주세요.```plaintext ```로 전체를 감싸면 반환 형식 위반입니다. ``` ``` 블록은 자료의 스켈레톤 코드처럼, 파일명 아래 파일 코드와 docstring을 적은 내용에만 사용해야 합니다.", False)
+        return (f"반환 형식에 따라 작성해주세요.```plaintext ```로 전체를 감싸면 반환 형식 위반입니다. ``` ``` 블록은 자료의 스켈레톤 코드처럼, 파일명 아래 파일 코드와 docstring을 적은 내용에만 사용해야 합니다.{datetime_string}", False)
     header_pattern = re.compile(r'^(#+)\s+(.+)/\s*$')
     file_pattern = re.compile(r'^(#+)\s+([\w/]+\.py)\s*$')
     test_tag_pattern = re.compile(r'<Test this>([\w/]+\.py)<Test this/>')
@@ -675,13 +677,13 @@ def validate_response_format(response_text: str) -> Tuple[str, bool]:
             headers.append((num_hashes, dir_name))
     
     if not headers:
-        return ("#으로 프로젝트 트리구조를 구분하여 작성되지 않았습니다.", False)
+        return (f"#으로 프로젝트 트리구조를 구분하여 작성되지 않았습니다.{datetime_string}", False)
     
     min_hash = min(header[0] for header in headers)
     top_level_dirs = [header for header in headers if header[0] == min_hash]
     
     if len(top_level_dirs) != 1:
-        return ("최상단 디렉토리 부터 #으로 트리 구조가 구분되도록 표현해야 합니다.", False)
+        return (f"최상단 디렉토리 부터 트리 구조가 구분 되도록 #으로 작성해야 합니다.{datetime_string}", False)
     
     top_level_dir_name = top_level_dirs[0][1]
     
@@ -717,7 +719,7 @@ def validate_response_format(response_text: str) -> Tuple[str, bool]:
     test_files = test_tag_pattern.findall(response_text)
     print(f"test_files: {test_files}")
     if not test_files:
-        return ("'<Test this>PATH/FILENAME<Test this/>' 형식의 태그가 작성되지 않았습니다.", False)
+        return (f"'<Test this>PATH/FILENAME<Test this/>' 형식의 태그가 작성되지 않았습니다.{datetime_string}", False)
     
     # 테스트 파일이 프로젝트 내에 존재하는지 확인
     missing_files = [file for file in test_files if file not in project_files]
@@ -725,7 +727,7 @@ def validate_response_format(response_text: str) -> Tuple[str, bool]:
     if missing_files:
         missing_str = ', '.join(missing_files)
         return (f"테스트 파일은 프로젝트 구조 내에 존재 해야 합니다.\
-이전에 작성 되어 있던 내용과 구조가 당신이 제출한 프로젝트 구조와 일치하지 않을 수 있습니다.", False)
+이전에 작성 되어 있던 내용과 구조가 당신이 제출한 프로젝트 구조와 일치하지 않을 수 있습니다.{datetime_string}", False)
     
     return ("형식이 올바릅니다.", True)
 

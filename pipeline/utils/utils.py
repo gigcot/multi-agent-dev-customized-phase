@@ -322,7 +322,7 @@ def validate_response_format(response_text: str) -> Tuple[str, bool]:
     top_level_dirs = [header for header in headers if header[0] == min_hash]
     
     if len(top_level_dirs) != 1:
-        return ("이전 작성 시도에 대한 응답: 코드 작성은 최상단 디렉토리 부터 #으로 구분하며 작성 해야 합니다.", False)
+        return ("이전 작성 시도에 대한 응답: 코드 작성은 최상단 디렉토리 부터 #으로 트리구조가 구분되도록 작성 해야 합니다.", False)
     
     top_level_dir_name = top_level_dirs[0][1]
     
